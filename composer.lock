@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "monolog/monolog",
-            "version": "1.23.0",
+            "version": "1.24.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "fd8c787753b3a2ad11bc60c063cff1358a32a3b4"
+                "reference": "bfc9ebb28f97e7a24c45bdc3f0ff482e47bb0266"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/fd8c787753b3a2ad11bc60c063cff1358a32a3b4",
-                "reference": "fd8c787753b3a2ad11bc60c063cff1358a32a3b4",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/bfc9ebb28f97e7a24c45bdc3f0ff482e47bb0266",
+                "reference": "bfc9ebb28f97e7a24c45bdc3f0ff482e47bb0266",
                 "shasum": ""
             },
             "require": {
@@ -82,20 +82,20 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2017-06-19T01:22:40+00:00"
+            "time": "2018-11-05T09:00:11+00:00"
         },
         {
             "name": "proteusthemes/wp-content-importer-v2",
-            "version": "v2.1.0",
+            "version": "v2.1.0.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/proteusthemes/WordPress-Importer.git",
-                "reference": "7414ce1bfb56a8be780c520ed63e99cac7ac403b"
+                "url": "https://github.com/bandicoot-marketing/WordPress-Importer.git",
+                "reference": "bf5a743638c278fb15bba856b054f3d7ad6d3f7c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/proteusthemes/WordPress-Importer/zipball/7414ce1bfb56a8be780c520ed63e99cac7ac403b",
-                "reference": "7414ce1bfb56a8be780c520ed63e99cac7ac403b",
+                "url": "https://api.github.com/repos/bandicoot-marketing/WordPress-Importer/zipball/bf5a743638c278fb15bba856b054f3d7ad6d3f7c",
+                "reference": "bf5a743638c278fb15bba856b054f3d7ad6d3f7c",
                 "shasum": ""
             },
             "type": "library",
@@ -104,18 +104,17 @@
                     "ProteusThemes\\WPContentImporter2\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-2.0+"
             ],
             "authors": [
                 {
-                    "name": "Primoz Cigler",
-                    "email": "primoz@proteusnet.com"
-                },
-                {
                     "name": "Gregor Capuder",
                     "email": "capuderg@gmail.com"
+                },
+                {
+                    "name": "Primoz Cigler",
+                    "email": "primoz@proteusnet.com"
                 },
                 {
                     "name": "Humanmade contributors",
@@ -131,20 +130,24 @@
                 "wordpress",
                 "wp"
             ],
-            "time": "2018-04-13T07:31:18+00:00"
+            "support": {
+                "source": "https://github.com/bandicoot-marketing/WordPress-Importer/tree/issue/1-random-postid",
+                "issues": "https://github.com/bandicoot-marketing/WordPress-Importer/issues"
+            },
+            "time": "2019-05-15T13:16:36+00:00"
         },
         {
             "name": "psr/log",
-            "version": "1.0.2",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
+                "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
-                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
+                "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
                 "shasum": ""
             },
             "require": {
@@ -178,7 +181,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10T12:19:37+00:00"
+            "time": "2018-11-20T15:27:04+00:00"
         }
     ],
     "packages-dev": [],

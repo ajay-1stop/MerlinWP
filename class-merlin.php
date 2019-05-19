@@ -56,7 +56,7 @@ class Merlin {
 	 *
 	 * @var    array
 	 */
-	protected $importer;
+	public $importer;
 
 	/**
 	 * WP Hook class.
@@ -404,7 +404,7 @@ class Merlin {
 	 *
 	 * @access public
 	 */
-	protected function is_possible_upgrade() {
+	public function is_possible_upgrade() {
 		return false;
 	}
 
@@ -412,6 +412,12 @@ class Merlin {
 	 * Add the admin menu item, under Appearance.
 	 */
 	public function add_admin_menu() {
+
+		// Don't show the Wizzard Menu Item if the user chose to hide it.
+		$wizzard_status = get_option( 'merlin_' . $this->slug . '_completed' );
+		if ( 'ignored' === $wizzard_status ) {
+			return;
+		}
 
 		// Strings passed in from the config file.
 		$strings = $this->strings;
@@ -551,7 +557,7 @@ class Merlin {
 	 * Output the content for the current step.
 	 */
 	protected function body() {
-		isset( $this->steps[ $this->step ] ) ? call_user_func( $this->steps[ $this->step ]['view'] ) : false;
+		isset( $this->steps[ $this->step ] ) ? call_user_func( $this->steps[ $this->step ]['view'], $this ) : false;
 	}
 
 	/**
@@ -749,7 +755,7 @@ class Merlin {
 			'view' => array( $this, 'ready' ),
 		);
 
-		$this->steps = apply_filters( $this->theme->template . '_merlin_steps', $this->steps );
+		$this->steps = apply_filters( $this->theme->template . '_merlin_steps', $this->steps, $this );
 	}
 
 	/**
@@ -801,8 +807,9 @@ class Merlin {
 
 	/**
 	 * Get the next step link.
+	 * Needs to be public for better extensibility.
 	 */
-	protected function step_next_link() {
+	public function step_next_link() {
 		$keys = array_keys( $this->steps );
 		$step = array_search( $this->step, $keys, true ) + 1;
 
@@ -837,9 +844,15 @@ class Merlin {
 
 			<?php echo wp_kses( $this->svg( array( 'icon' => 'welcome' ) ), $this->svg_allowed_html() ); ?>
 
+			<?php do_action( 'merlin_step_before_header', 'welcome', $already_setup );?>
+
 			<h1><?php echo esc_html( sprintf( $header, $theme ) ); ?></h1>
 
+			<?php do_action( 'merlin_step_after_header', 'welcome', $already_setup );?>
+
 			<p><?php echo esc_html( sprintf( $paragraph, $theme ) ); ?></p>
+
+			<?php do_action( 'merlin_step_after_paragraph', 'welcome', $already_setup );?>
 
 		</div>
 
@@ -901,9 +914,15 @@ class Merlin {
 				<circle class="icon--checkmark__circle" cx="26" cy="26" r="25" fill="none"/><path class="icon--checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
 			</svg>
 
+			<?php do_action( 'merlin_step_before_header', 'license' );?>
+
 			<h1><?php echo esc_html( sprintf( $header, $theme ) ); ?></h1>
 
+			<?php do_action( 'merlin_step_after_header', 'license' );?>
+
 			<p id="license-text"><?php echo esc_html( sprintf( $paragraph, $theme ) ); ?></p>
+
+			<?php do_action( 'merlin_step_after_paragraph', 'license' );?>
 
 			<?php if ( ! $is_theme_registered ) : ?>
 				<div class="merlin__content--license-key">
@@ -989,11 +1008,17 @@ class Merlin {
 				<circle class="icon--checkmark__circle" cx="26" cy="26" r="25" fill="none"/><path class="icon--checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
 			</svg>
 
+			<?php do_action( 'merlin_step_before_header', 'child' );?>
+
 			<h1><?php echo esc_html( $header ); ?></h1>
+
+			<?php do_action( 'merlin_step_after_header', 'child' );?>
 
 			<p id="child-theme-text"><?php echo esc_html( sprintf( $paragraph, $theme ) ); ?></p>
 
 			<a class="merlin__button merlin__button--knockout merlin__button--no-chevron merlin__button--external" href="<?php echo esc_url( $action_url ); ?>" target="_blank"><?php echo esc_html( $action ); ?></a>
+
+			<?php do_action( 'merlin_step_after_paragraph', 'child' );?>
 
 		</div>
 
@@ -1074,9 +1099,16 @@ class Merlin {
 				<circle class="icon--checkmark__circle" cx="26" cy="26" r="25" fill="none"/><path class="icon--checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
 			</svg>
 
+			<?php do_action( 'merlin_step_before_header', 'plugins' );?>
+
 			<h1><?php echo esc_html( $header ); ?></h1>
 
+			<?php do_action( 'merlin_step_after_header', 'plugins' );?>
+
 			<p><?php echo esc_html( $paragraph ); ?></p>
+
+			<?php do_action( 'merlin_step_after_paragraph', 'plugins' );?>
+
 
 			<?php if ( $count ) { ?>
 				<a id="merlin__drawer-trigger" class="merlin__button merlin__button--knockout"><span><?php echo esc_html( $action ); ?></span><span class="chevron"></span></a>
@@ -1173,9 +1205,15 @@ class Merlin {
 				<circle class="icon--checkmark__circle" cx="26" cy="26" r="25" fill="none"/><path class="icon--checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
 			</svg>
 
+			<?php do_action( 'merlin_step_before_header', 'content' );?>
+
 			<h1><?php echo esc_html( $header ); ?></h1>
 
+			<?php do_action( 'merlin_step_after_header', 'content' );?>
+
 			<p><?php echo esc_html( $paragraph ); ?></p>
+
+			<?php do_action( 'merlin_step_after_paragraph', 'content' );?>
 
 			<?php if ( 1 < count( $this->import_files ) ) : ?>
 
@@ -1281,9 +1319,15 @@ class Merlin {
 
 			<?php echo wp_kses( $this->svg( array( 'icon' => 'done' ) ), $this->svg_allowed_html() ); ?>
 
+			<?php do_action( 'merlin_step_before_header', 'done' );?>
+
 			<h1><?php echo esc_html( sprintf( $header, $theme ) ); ?></h1>
 
+			<?php do_action( 'merlin_step_after_header', 'done' );?>
+
 			<p><?php wp_kses( printf( $paragraph, $author ), $allowed_html_array ); ?></p>
+
+			<?php do_action( 'merlin_step_after_paragraph', 'done' );?>
 
 		</div>
 
@@ -1791,15 +1835,26 @@ class Merlin {
 	 * @internal    Used as a callback.
 	 */
 	function _ajax_content() {
-		static $content = null;
 
+		if ( ! check_ajax_referer( 'merlin_nonce', 'wpnonce' ) || ! current_user_can( 'install_themes' ) ) {
+			$this->logger->error( __( 'User has no right to perform an AJAX action', '@@textdomain' ) );
+
+			wp_send_json_error(
+				array(
+					'error'   => 1,
+					'message' => esc_html__( 'You have no right to perform this action', '@@textdomain' ),
+				)
+			);
+		}
+
+		static $content = null;
 		$selected_import = intval( $_POST['selected_index'] );
 
 		if ( null === $content ) {
 			$content = $this->get_import_data( $selected_import );
 		}
 
-		if ( ! check_ajax_referer( 'merlin_nonce', 'wpnonce' ) || empty( $_POST['content'] ) && isset( $content[ $_POST['content'] ] ) ) {
+		if ( empty( $_POST['content'] ) && isset( $content[ $_POST['content'] ] ) ) {
 			$this->logger->error( __( 'The content importer AJAX call failed to start, because of incorrect data', '@@textdomain' ) );
 
 			wp_send_json_error(
@@ -1811,35 +1866,65 @@ class Merlin {
 		}
 
 		$json         = false;
-		$this_content = $content[ $_POST['content'] ];
+		$content_type = $_POST['content'];
+		$this_content = $content[ $content_type ];
+		$next_to_import = isset( $_POST['next_to_import'] ) ? intval( $_POST['next_to_import'] ): 0;
+
+		$title = '';
+		$data = '';
 
 		if ( isset( $_POST['proceed'] ) ) {
 			if ( is_callable( $this_content['install_callback'] ) ) {
+				if ( ! empty( $this_content['data'] ) ) {
+					// if ( 'content-set' === $content_type ) {
+					if ( isset( $this_content['data'][ $next_to_import ]['file_path'] ) ) {
+
+						$title = $this_content['data'][ $next_to_import ]['title'];
+						$data  = $this_content['data'][ $next_to_import ]['file_path'];
+
+						error_log ( $title );
+
+						if	( isset( $this_content['data'][ $next_to_import + 1 ] ) ) {
+							$next_to_import = $next_to_import + 1;
+						} else {
+							$next_to_import = -1; // No more files in this request.
+						}
+					} else {
+						$title = $this_content['title'];
+						$data  = $this_content['data'];
+						$next_to_import = -1; // No more files in this request.
+					}
+				}
+
 				$this->logger->info(
 					__( 'The content import AJAX call will be executed with this import data', '@@textdomain' ),
 					array(
-						'title' => $this_content['title'],
-						'data'  => $this_content['data'],
+						'title' => $title,
+						'data'  => $data,
 					)
 				);
 
-				$logs = call_user_func( $this_content['install_callback'], $this_content['data'] );
+				$logs = call_user_func( $this_content['install_callback'], $data );
+
+				do_action( 'merlin_content_file_imported', $data, $logs );
+
 				if ( $logs ) {
 					$json = array(
-						'done'    => 1,
 						'message' => $this_content['success'],
 						'debug'   => '',
 						'logs'    => $logs,
 						'errors'  => '',
 					);
 
-					// The content import ended, so we should mark that all posts were imported.
-					if ( 'content' === $_POST['content'] ) {
+					// The single content import ended, so we should mark that all posts were imported.
+					if ( 'content' === $content_type ) {
 						$json['num_of_imported_posts'] = 'all';
 					}
 				}
 			}
-		} else {
+		}
+
+		if ( false === $json || -1 !== $next_to_import ) {
 			$json = array(
 				'url'            => admin_url( 'admin-ajax.php' ),
 				'action'         => 'merlin_content',
@@ -1850,7 +1935,14 @@ class Merlin {
 				'message'        => $this_content['installing'],
 				'logs'           => '',
 				'errors'         => '',
+				'next_to_import' => $next_to_import,
+				'num_of_imported_posts' => $this->importer->get_number_of_posts_to_import( $data ),
 			);
+		}
+
+		if	( $json && -1 === $next_to_import ) {
+			$json['done'] = 1;
+			do_action( 'merlin_content_set_imported', $content_type );
 		}
 
 		if ( $json ) {
@@ -1880,11 +1972,12 @@ class Merlin {
 
 	/**
 	 * AJAX call to retrieve total items (posts, pages, CPT, attachments) for the content import.
+	 * Used to render loading progress bar.
 	 */
 	public function _ajax_get_total_content_import_items() {
-		if ( ! check_ajax_referer( 'merlin_nonce', 'wpnonce' ) && empty( $_POST['selected_index'] ) ) {
-			$this->logger->error( __( 'The content importer AJAX call for retrieving total content import items failed to start, because of incorrect data.', '@@textdomain' ) );
 
+		if ( ! current_user_can( 'install_themes' ) || ! check_ajax_referer( 'merlin_nonce', 'wpnonce' ) && empty( $_POST['selected_index'] ) ) {
+			$this->logger->error( __( 'The content importer AJAX call for retrieving total content import items failed to start, because of incorrect data.', '@@textdomain' ) );
 			wp_send_json_error(
 				array(
 					'error'   => 1,
@@ -1896,7 +1989,21 @@ class Merlin {
 		$selected_import = intval( $_POST['selected_index'] );
 		$import_files    = $this->get_import_files_paths( $selected_import );
 
-		wp_send_json_success( $this->importer->get_number_of_posts_to_import( $import_files['content'] ) );
+
+		// Calculate number of posts in the main import file (local_import_file/import_file_url).
+		$import_count_total = intval( $this->importer->get_number_of_posts_to_import( $import_files['content'] ) );
+
+		// Calculate number of posts in the content-set files.
+		if ( ! empty( $import_files['content-set'] )  ) {
+			foreach ( $import_files['content-set'] as $key => $import_item) {
+				if ( ! empty( $import_item['file_path'] ) ) {
+					$import_count_total = $import_count_total + intval( $this->importer->get_number_of_posts_to_import( $import_item['file_path'] ) );
+				}
+
+			}
+		}
+
+		wp_send_json_success( $import_count_total );
 	}
 
 
@@ -1909,8 +2016,10 @@ class Merlin {
 	 * @return bool|array
 	 */
 	public function get_import_data_info( $selected_import_index = 0 ) {
+
 		$import_data = array(
 			'content'      => false,
+			'content-set'  => false,
 			'widgets'      => false,
 			'options'      => false,
 			'sliders'      => false,
@@ -1927,6 +2036,10 @@ class Merlin {
 			! empty( $this->import_files[ $selected_import_index ]['local_import_file'] )
 		) {
 			$import_data['content'] = true;
+		}
+
+		if ( ! empty( $this->import_files[ $selected_import_index ]['content-set'] ) ) {
+			$import_data['content-set'] = true;
 		}
 
 		if (
@@ -1987,6 +2100,19 @@ class Merlin {
 				'checked'          => $this->is_possible_upgrade() ? 0 : 1,
 				'install_callback' => array( $this->importer, 'import' ),
 				'data'             => $import_files['content'],
+			);
+		}
+
+		if ( ! empty( $import_files['content-set'] ) ) {
+			$content['content-set'] = array(
+				'title'            => ( ! empty( $import_files['content'] ) ) ? esc_html__( 'Extra Content', '@@textdomain' ): esc_html__( 'Content', '@@textdomain' ),
+				'description'      => esc_html__( 'Demo content data.', '@@textdomain' ),
+				'pending'          => esc_html__( 'Pending', '@@textdomain' ),
+				'installing'       => esc_html__( 'Installing', '@@textdomain' ),
+				'success'          => esc_html__( 'Success', '@@textdomain' ),
+				'checked'          => $this->is_possible_upgrade() ? 0 : 1,
+				'install_callback' => array( $this->importer, 'import' ),
+				'data'             => $import_files['content-set'],
 			);
 		}
 
@@ -2055,7 +2181,7 @@ class Merlin {
 			);
 		}
 
-		$content = apply_filters( 'merlin_get_base_content', $content, $this );
+		$content = apply_filters( 'merlin_get_base_content', $content, $this, $import_files, $selected_import_index );
 
 		return $content;
 	}
@@ -2203,11 +2329,12 @@ class Merlin {
 
 		$base_file_name = $this->import_file_base_name;
 		$import_files   = array(
-			'content' => '',
-			'widgets' => '',
-			'options' => '',
-			'redux'   => array(),
-			'sliders' => '',
+			'content' 		=> '',
+			'content-set' 	=> array(),
+			'widgets' 		=> '',
+			'options' 		=> '',
+			'redux'   		=> array(),
+			'sliders' 		=> '',
 		);
 
 		$downloader = new Merlin_Downloader();
@@ -2233,6 +2360,62 @@ class Merlin {
 			if ( is_wp_error( $import_files['content'] ) ) {
 				$import_files['content'] = '';
 			}
+		}
+
+		// Get extra/complex content sets.
+		if ( ! empty( $selected_import_data['content-set'] ) ) {
+			$content_items = array();
+
+			// Setup filename paths to save the content set.
+			foreach ( $selected_import_data['content-set'] as $index => $content_item ) {
+
+				$file_path = '';
+
+				// Check if 'import_file_url' is not defined. That would mean a local file.
+				if ( empty( $content_item['remote_file'] ) ) {
+					// Content item should import data from the local file.
+					if ( ! empty( $content_item['local_file'] ) && file_exists( $content_item['local_file'] ) ) {
+						$file_path = $content_item['local_file'];
+					}
+				} else {
+					// Content item should import data from the remote server.
+					// New local file name for the file.
+					$content_filename = 'content-' . $index . '-' . $base_file_name . '.json';
+
+					// Check if file was already imported.
+					$file_path = $downloader->fetch_existing_file( $content_filename );
+
+					// Download the file from remote server, if it's missing.
+					if ( empty( $file_path ) ) {
+						$file_path = $downloader->download_file( $content_item['remote_file'], $content_filename );
+					}
+
+					// Reset the variable, if there was an error.
+					if ( is_wp_error( $file_path ) ) {
+						$file_path = '';
+					}
+				}
+
+				$content_items[] = array(
+					'title' => $content_item['title'],
+					'file_path'   => $file_path,
+				);
+			}
+
+			// Define the content set import files (downloaded from remote).
+			$import_files['content-set'] = $content_items;
+		} elseif ( ! empty( $selected_import_data['local_import_redux'] ) ) {
+			$content_items = array();
+
+			// Setup filename paths to save the Redux content.
+			foreach ( $selected_import_data['local_import_redux'] as $content_item ) {
+				if ( file_exists( $content_item['file_path'] ) ) {
+					$content_items[] = $content_item;
+				}
+			}
+
+			// Define the content set import files (local import).
+			$import_files['content-set'] = $content_items;
 		}
 
 		// Get widgets file as well. If defined!
@@ -2347,6 +2530,8 @@ class Merlin {
 			$import_files['redux'] = $redux_items;
 		}
 
+		$import_files = apply_filters( 'merlin_get_import_files_paths', $import_files, $this );
+
 		return $import_files;
 	}
 
@@ -2381,12 +2566,15 @@ class Merlin {
 				if ( ! $available ) {
 					continue;
 				}
+				// Prepare Advanced import item title (Content, Widgets, Redux, ... ).
+				$content = $this->get_import_data();
+				$title = ! empty( $content[ $slug ]['title'] ) ? $content[ $slug ]['title']: ucfirst( str_replace( '_', ' ', $slug ) );
 				?>
 
 				<li class="merlin__drawer--import-content__list-item status status--Pending" data-content="<?php echo esc_attr( $slug ); ?>">
 					<input type="checkbox" name="default_content[<?php echo esc_attr( $slug ); ?>]" class="checkbox checkbox-<?php echo esc_attr( $slug ); ?>" id="default_content_<?php echo esc_attr( $slug ); ?>" value="1" checked>
 					<label for="default_content_<?php echo esc_attr( $slug ); ?>">
-						<i></i><span><?php echo esc_html( ucfirst( str_replace( '_', ' ', $slug ) ) ); ?></span>
+						<i></i><span><?php echo esc_html( $title ); ?></span>
 					</label>
 				</li>
 

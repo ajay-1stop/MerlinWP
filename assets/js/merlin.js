@@ -358,16 +358,23 @@ function PluginManager(){
                 currentSpan.addClass(response.message.toLowerCase());
 
                 if( typeof response.num_of_imported_posts !== "undefined" && 0 < total_content_import_items ) {
-                    current_content_import_items = 'all' === response.num_of_imported_posts ? total_content_import_items : response.num_of_imported_posts;
+                    current_content_import_items = 'all' === response.num_of_imported_posts ? total_content_import_items : current_content_import_items + response.num_of_imported_posts;
                     update_progress_bar();
                 }
 
-                if(typeof response.url !== "undefined"){
+                if(typeof response.done !== "undefined"){
+                    // All demo posts imported. Update progress bar.
+                    current_content_import_items = total_content_import_items;
+                    update_progress_bar();
+                    clearInterval( progress_bar_interval );
+                    // finished processing this plugin, move onto next
+                    find_next();
+                } else if( typeof response.url !== "undefined" ){
                     // we have an ajax url action to perform.
                     if(response.hash === current_item_hash){
                         currentSpan.addClass("status--failed");
                         find_next();
-                    }else {
+                    } else {
                         current_item_hash = response.hash;
 
                         // Fix the undefined selected_index issue on new AJAX calls.
@@ -377,15 +384,11 @@ function PluginManager(){
 
                         jQuery.post(response.url, response, ajax_callback).fail(ajax_callback); // recuurrssionnnnn
                     }
-                }else if(typeof response.done !== "undefined"){
-                    // finished processing this plugin, move onto next
-                    find_next();
                 }else{
                     // error processing this plugin
                     find_next();
                 }
             }else{
-                console.log(response);
                 // error - try again with next plugin
                 currentSpan.addClass("status--error");
                 find_next();
@@ -419,7 +422,6 @@ function PluginManager(){
                 $current_node.find(".spinner").css("visibility","hidden");
             }
             var $items = $(".merlin__drawer--import-content__list-item");
-            var $enabled_items = $(".merlin__drawer--import-content__list-item input:checked");
             $items.each(function(){
                 if (current_item == "" || do_next) {
                     current_item = $(this).data("content");
@@ -436,7 +438,8 @@ function PluginManager(){
         }
 
         function init_content_import_progress_bar() {
-            if( ! $(".merlin__drawer--import-content__list-item .checkbox-content").is( ':checked' ) ) {
+            if( ! $(".merlin__drawer--import-content__list-item .checkbox-content").is( ':checked' )
+                    && ! $(".merlin__drawer--import-content__list-item .checkbox-content-set").is( ':checked' ) ) {
                 return false;
             }
 
@@ -468,6 +471,10 @@ function PluginManager(){
 
             var $percentage = valBetween( ((current_content_import_items/total_content_import_items) * 100) , 0, 99);
 
+            if ( isNaN( $percentage ) ) {
+                $percentage = 50;
+            }
+
             $('.js-merlin-progress-bar-percentage').html( Math.round( $percentage ) + '%' );
 
             if ( 1 === current_content_import_items/total_content_import_items ) {
@@ -481,15 +488,15 @@ function PluginManager(){
                 $(".merlin__drawer--import-content").find("input").prop("disabled", true);
                 complete = function(){
 
-			$.post(merlin_params.ajaxurl, {
-				action: "merlin_import_finished",
-				wpnonce: merlin_params.wpnonce,
-				selected_index: $( '.js-merlin-demo-import-select' ).val() || 0
-			});
+                    $.post(merlin_params.ajaxurl, {
+                        action: "merlin_import_finished",
+                        wpnonce: merlin_params.wpnonce,
+                        selected_index: $( '.js-merlin-demo-import-select' ).val() || 0
+                    });
 
-			setTimeout(function(){
-				$('.js-merlin-progress-bar-percentage').html( '100%' );
-			},100);
+                    setTimeout(function(){
+                        $('.js-merlin-progress-bar-percentage').html( '100%' );
+                    },100);
 
                 	setTimeout(function(){
 				       body.removeClass( drawer_opened );
